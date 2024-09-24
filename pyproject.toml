@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "conf-manager"
 version = "0.1.0"
-description = "A collection of scripts to manage overriding individual ini settings on a system"
+description = "A tool to manage configuration file overrides"
 authors = ["Johnny Castrup <johnny@castrup.net>"]
 readme = "README.md"
 
@@ -11,8 +11,6 @@ packages = [{include = "conf_manager"}]
 python = "^3.12"
 pyyaml = "^6.0.2"
 click = "^8.1.7"
-configparser = "^7.1.0"
-
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
@@ -23,3 +21,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 conf-manager = "conf_manager.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "conf_manager"]
