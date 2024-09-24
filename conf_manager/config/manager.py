@@ -17,10 +17,15 @@ class ConfigManager:
         self.logger = get_logger(__name__)
 
     def run(self, dry_run: bool = False):
-        self.logger.info("Starting configuration management process")
-        self.load_all_overrides()
-        self.apply_all_overrides(dry_run)
-        self.logger.info("Configuration management process completed")
+        try:
+            self.logger.info("Starting configuration management process")
+            self.load_all_overrides()
+            self.apply_all_overrides(dry_run)
+            self.logger.info("Configuration management process completed")
+            return 0  # Success
+        except Exception as e:
+            self.logger.error(f"Configuration management process failed: {e}")
+            return 1  # Failure
 
     def load_all_overrides(self):
         self.logger.info(f"Loading overrides from directory: {self.override_dir}")

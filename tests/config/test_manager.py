@@ -12,11 +12,11 @@ def setup_test_logging(caplog):
 
 @pytest.fixture
 def config_manager(tmp_path):
-    override_dir = tmp_path / "override.d"
-    override_dir.mkdir()
-    config_dir = tmp_path / "config"
-    config_dir.mkdir()
-    return ConfigManager(str(override_dir), str(config_dir))
+    from_dir = tmp_path / "override.d"
+    from_dir.mkdir()
+    to_dir = tmp_path / "config"
+    to_dir.mkdir()
+    return ConfigManager(str(from_dir), str(to_dir))
 
 def test_load_all_overrides(config_manager, tmp_path, caplog):
     # Create sample override files
@@ -104,7 +104,10 @@ def test_run(config_manager, tmp_path, caplog):
           key3: new_value3
     """)
 
-    config_manager.run()
+    exit_code = config_manager.run(dry_run=False)
+
+    # Check the exit code
+    assert exit_code == 0  # Expecting success
 
     # Check the result
     with open(config_file, 'r') as f:
@@ -116,6 +119,7 @@ def test_run(config_manager, tmp_path, caplog):
     # Check log messages
     assert any("Starting configuration management process" in record.message for record in caplog.records)
     assert any("Configuration management process completed" in record.message for record in caplog.records)
+    assert any("Applied overrides to" in record.message for record in caplog.records)
 
 def test_dry_run(config_manager, tmp_path, caplog):
     # Create a sample config file
@@ -134,7 +138,10 @@ def test_dry_run(config_manager, tmp_path, caplog):
           key1: new_value1
     """)
 
-    config_manager.run(dry_run=True)
+    exit_code = config_manager.run(dry_run=True)
+
+    # Check the exit code
+    assert exit_code == 0  # Expecting success
 
     # Check that the file hasn't been modified
     with open(config_file, 'r') as f:
@@ -143,4 +150,6 @@ def test_dry_run(config_manager, tmp_path, caplog):
     assert "key1 = new_value1" not in content
 
     # Check log messages
+    assert any("Starting configuration management process" in record.message for record in caplog.records)
+    assert any("Configuration management process completed" in record.message for record in caplog.records)
     assert any("Would apply overrides to" in record.message for record in caplog.records)
