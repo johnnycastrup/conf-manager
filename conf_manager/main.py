@@ -4,11 +4,15 @@ from conf_manager.utils.logging_config import setup_logging
 import logging
 
 @click.command()
-@click.option('--override-dir', '-o', type=click.Path(exists=True), help='Path to the override.d directory')
-@click.option('--config-dir', '-c', type=click.Path(exists=True), help='Directory containing config files to modify')
+@click.option('--override-dir', '-o', type=click.Path(exists=True), required=True, help='Path to the override.d directory')
+@click.option('--config-dir', '-c', type=click.Path(exists=True), required=True, help='Directory containing config files to modify')
 @click.option('--dry-run', '-d', is_flag=True, help='Perform a dry run without making changes')
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose logging')
 def main(override_dir, config_dir, dry_run, verbose):
+    if not override_dir or not config_dir:
+        click.echo("Error: Both --override-dir and --config-dir must be provided.")
+        return
+
     log_level = logging.DEBUG if verbose else logging.INFO
     setup_logging(level=log_level)
 
