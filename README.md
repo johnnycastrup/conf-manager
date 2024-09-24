@@ -1,60 +1,172 @@
 # conf-manager
-A collection of scripts to manage overriding individual ini settings on a system
+
+A tool for managing configuration file overrides in a system.
 
 ## Description
 
-The `conf-manager` package provides a set of scripts for managing override files, which allow you to customize individual ini settings on your system. This package is designed to be highly customizable and extensible.
+The `conf-manager` package provides a set of tools for managing override files, allowing you to customize individual settings in configuration files across your system. It's designed to be highly customizable, extensible, and easy to use.
 
 ## Features
 
-* Load override files from a specified directory
-* Apply overrides to config files in a target directory
-* Supports dry run mode to simulate changes without modifying the system
-* Log file changes and errors for auditing purposes
-* Configurable paths for override directories and config files
+- Load override files from a specified directory
+- Apply overrides to config files in a target directory
+- Support for both INI and YAML configuration file formats
+- Dry run mode to simulate changes without modifying the system
+- Detailed logging for auditing and debugging purposes
+- Configurable paths for override directories and config files
+- Backup creation before applying changes
 
 ## Installation
 
-To install `conf-manager`, clone the project and use the following command:
-```
-poetry install conf-manager
-```
+### Using Nix Flakes (Recommended)
+
+If you have Nix with flakes enabled, you can install and run `conf-manager` directly:
+
+1. To run without installing:
+   ```bash
+   nix run github:johnnycastrup/conf-manager
+   ```
+
+2. To install in your current environment:
+   ```bash
+   nix profile install github:johnnycastrup/conf-manager
+   ```
+
+3. To use in a project, add it to your `flake.nix` inputs:
+   ```nix
+   {
+     inputs.conf-manager.url = "github:johnnycastrup/conf-manager";
+     # ...
+   }
+   ```
+
+### Using Poetry
+
+Alternatively, you can install using Poetry:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/johnnycastrup/conf-manager.git
+   cd conf-manager
+   ```
+
+2. Install dependencies:
+   ```bash
+   poetry install
+   ```
 
 ## Usage
 
-You can run the main script using the following command:
+### With Nix Flakes
+
+Run the main script using:
+
+```bash
+nix run github:johnnycastrup/conf-manager -- -o <override_directory> -c <config_directory> [options]
 ```
-conf-manager -o <override_directory> -c <config_directory> [-d]
+
+### With Poetry
+
+Run the main script using:
+
+```bash
+poetry run conf-manager -o <override_directory> -c <config_directory> [options]
 ```
-Replace `<override_directory>` with the path to your override files, and `<config_directory>` with the directory containing the config files you want to modify. The `-d` flag enables dry run mode.
+
+Options:
+- `-o, --override-dir`: Path to the directory containing override files (required)
+- `-c, --config-dir`: Path to the directory containing config files to modify (required)
+- `-d, --dry-run`: Perform a dry run without making changes
+- `-v, --verbose`: Enable verbose logging
+
+Example:
+```bash
+nix run github:johnnycastrup/conf-manager -- -o /etc/conf-manager/override.d -c /etc/myapp -v
+```
 
 ## Configuration
 
-You can configure the `conf-manager` package by setting environment variables or using a configuration file. For more information, see the [configuration documentation](TODO: link to configuration documentation).
+Override files should be placed in the specified override directory and follow this YAML format:
+
+```yaml
+overrides:
+  config_file_name:
+    section_name:
+      key: new_value
+```
+
+For example:
+```yaml
+overrides:
+  app_config.ini:
+    Database:
+      host: new_database_host
+      port: 5432
+```
 
 ## Development
 
-To contribute to the development of `conf-manager`, clone this repository and install the dependencies using:
-```
-poetry install
+### Using Nix Flakes
+
+To enter a development environment:
+
+```bash
+nix develop github:johnnycastrup/conf-manager
 ```
 
-Then, run the tests using:
+This will give you a shell with all necessary dependencies.
+
+### Using Poetry
+
+To set up the development environment:
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   poetry install
+   ```
+3. Run tests:
+   ```bash
+   poetry run pytest
+   ```
+
+## Project Structure
+
 ```
-pytest
+conf-manager/
+├── conf_manager/
+│   ├── config/
+│   │   ├── manager.py
+│   │   └── parser.py
+│   ├── file/
+│   │   └── file_manager.py
+│   ├── override/
+│   │   └── processor.py
+│   └── utils/
+│       └── logging_config.py
+├── tests/
+│   ├── config/
+│   ├── file/
+│   └── override/
+├── pyproject.toml
+├── flake.nix
+└── README.md
 ```
 
-Finally, build and package the project using:
-```
-poetry build
-```
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-`conf-manager` is licensed under the MIT License. For more information, see the [LICENSE](LICENSE) file.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Authors
 
-* Johnny Castrup <johnny@castrup.net>
+- Johnny Castrup <johnny@castrup.net>
 
-**Note:** This README was generated based on the provided `pyproject.toml` and `main.py` files.
+## Acknowledgments
+
+- Thanks to all contributors who have helped shape this project.
+- Special thanks to the Python community for providing excellent libraries that make this project possible.
+- Gratitude to the Nix community for enabling reproducible builds and deployments.
