@@ -18,7 +18,7 @@ def config_manager(tmp_path):
     config_dir.mkdir()
     return ConfigManager(str(override_dir), str(config_dir))
 
-def test_load_overrides(config_manager, tmp_path, caplog):
+def test_load_all_overrides(config_manager, tmp_path, caplog):
     # Create sample override files
     override1 = tmp_path / "override.d" / "01-override.yaml"
     override1.write_text("""
@@ -36,7 +36,7 @@ def test_load_overrides(config_manager, tmp_path, caplog):
           key2: value2
     """)
 
-    config_manager.load_overrides()
+    config_manager.load_all_overrides()
 
     assert len(config_manager.override_set.overrides) == 1
     overrides = list(config_manager.override_set.overrides.values())[0]
@@ -46,7 +46,7 @@ def test_load_overrides(config_manager, tmp_path, caplog):
     assert any("Loading overrides from directory" in record.message for record in caplog.records)
     assert any("Total overrides loaded: 2" in record.message for record in caplog.records)
 
-def test_apply_overrides(config_manager, tmp_path, caplog):
+def test_apply_all_overrides(config_manager, tmp_path, caplog):
     # Create a sample config file
     config_file = tmp_path / "config" / "config.ini"
     config_file.write_text("""
@@ -72,8 +72,8 @@ def test_apply_overrides(config_manager, tmp_path, caplog):
           key2: new_value2
     """)
 
-    config_manager.load_overrides()
-    config_manager.apply_overrides()
+    config_manager.load_all_overrides()
+    config_manager.apply_all_overrides(dry_run=False)
 
     # Check the result
     with open(config_file, 'r') as f:

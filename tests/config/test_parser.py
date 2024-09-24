@@ -21,7 +21,7 @@ def test_parse_ini_file(tmp_path):
         'Section1': {'key1': 'value1', 'key2': 'value2'},
         'Section2': {'key3': 'value3'}
     }
-    assert parser.get_file_format(str(ini_file)) == ConfigFileFormat.INI
+    assert parser.determine_file_format(str(ini_file)) == ConfigFileFormat.INI
 
 def test_parse_yaml_file(tmp_path):
     # Create a temporary YAML file
@@ -42,7 +42,7 @@ def test_parse_yaml_file(tmp_path):
         'Section1': {'key1': 'value1', 'key2': 'value2'},
         'Section2': {'key3': 'value3'}
     }
-    assert parser.get_file_format(str(yaml_file)) == ConfigFileFormat.YAML
+    assert parser.determine_file_format(str(yaml_file)) == ConfigFileFormat.YAML
 
 def test_parse_unsupported_format(tmp_path):
     # Create a file with an unsupported extension

@@ -35,18 +35,33 @@ class OverrideProcessor:
         self.logger = get_logger(__name__)
 
     def process(self, override_set: OverrideSet, target_file: str):
+        self.ensure_file_exists(target_file)
+        self.logger.info(f"Processing overrides for {target_file}")
+        
+        config_data = self.load_config_data(target_file)
+        overrides = override_set.get_overrides_for_file(target_file)
+        
+        self.apply_overrides(config_data, overrides)
+        self.save_config_data(config_data, target_file)
+        
+        self.logger.info(f"Finished processing overrides for {target_file}")
+
+    def ensure_file_exists(self, target_file: str):
         if not os.path.exists(target_file):
             raise FileNotFoundError(f"The file {target_file} does not exist.")
 
-        self.logger.info(f"Processing overrides for {target_file}")
-        config_data = self.config_parser.parse(target_file)
-        overrides = override_set.get_overrides_for_file(target_file)
+    def load_config_data(self, target_file: str) -> dict:
+        return self.config_parser.parse(target_file)
 
+    def apply_overrides(self, config_data: dict, overrides: List[Override]):
         for override in overrides:
-            if override.section not in config_data:
-                config_data[override.section] = {}
-            config_data[override.section][override.key] = override.value
-            self.logger.debug(f"Applied override: {override}")
+            self.apply_single_override(config_data, override)
 
+    def apply_single_override(self, config_data: dict, override: Override):
+        if override.section not in config_data:
+            config_data[override.section] = {}
+        config_data[override.section][override.key] = override.value
+        self.logger.debug(f"Applied override: {override}")
+
+    def save_config_data(self, config_data: dict, target_file: str):
         self.config_parser.serialize(config_data, target_file)
-        self.logger.info(f"Finished processing overrides for {target_file}")
